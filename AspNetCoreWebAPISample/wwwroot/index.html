@@ -6,13 +6,46 @@
     <script src="Scripts/jquery-3.7.1.min.js"></script>
 </head>
 <body>
-    Test
+    <input type="text" id="searchID" />
+    <button onclick="searchContact()">Search</button>
+    <button onclick="addContact()">Add Contact</button>
+
     <script type="text/javascript">
         $(document).ready(function () {
-            $.getJSON("api/Contact", function (result) {
+            $.getJSON("api/contact", function (result) {
                 console.log(result);
             });
         });
+
+        function searchContact() {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "api/Contact/" + $("#searchID").val(),
+                success: function (result) {
+                    console.info(result);
+                }
+            });
+        }
+
+        function addContact() {
+            var newContact = {
+                "Id": 0,
+                "FirstName": "Tony",
+                "LastName": "Jun"
+            }
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(newContact),
+                url: "api/Contact/",
+                success: function (result) {
+                    console.info(result);
+                }
+            });
+        }
+
     </script>
 </body>
 </html>

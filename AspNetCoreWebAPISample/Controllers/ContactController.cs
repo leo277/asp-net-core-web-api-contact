@@ -1,4 +1,5 @@
-﻿using AspNetCoreWebAPISample.Models;
+﻿//using System.Web.Http;
+using AspNetCoreWebAPISample.Models;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -26,15 +27,28 @@ namespace AspNetCoreWebAPISample.Controllers
 
         // GET api/<ContactController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public IActionResult Get(int id)
         {
-            return "value";
+            Contact contact = contacts.FirstOrDefault(c => c.Id == id);
+
+            if (contact == null)
+            {
+                return NotFound();
+            }
+            return Ok(contact);
         }
 
         // POST api/<ContactController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IEnumerable<Contact> Post([FromBody] Contact newContact)
         {
+            List<Contact> contactList = contacts.ToList<Contact>();
+
+            newContact.Id = contactList.Count;
+            contactList.Add(newContact);
+            contacts = contactList.ToArray();
+
+            return contacts;
         }
 
         // PUT api/<ContactController>/5
