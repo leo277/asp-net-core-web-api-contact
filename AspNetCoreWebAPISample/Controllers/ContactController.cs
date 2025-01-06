@@ -38,6 +38,18 @@ namespace AspNetCoreWebAPISample.Controllers
             return Ok(contact);
         }
 
+        //GET: api/Contact/search?name=John
+        /* search is case insensitive */
+        [HttpGet("search")]
+        public IActionResult GetContactsByName([FromQuery] string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return BadRequest("Nmae parameter is required");
+            
+            Contact[] contactArray = contacts.Where<Contact>(c => c.FirstName.Contains(name, StringComparison.OrdinalIgnoreCase) || c.LastName.Contains(name, StringComparison.OrdinalIgnoreCase)).ToArray<Contact>();
+            
+            return Ok(contactArray);
+        }
+
         // POST api/<ContactController>
         [HttpPost]
         public IEnumerable<Contact> Post([FromBody] Contact newContact)
@@ -53,14 +65,27 @@ namespace AspNetCoreWebAPISample.Controllers
 
         // PUT api/<ContactController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public IEnumerable<Contact> Put(int id, [FromBody] Contact changedContact)
         {
+            Contact? contact = contacts.FirstOrDefault<Contact>(c => c.Id == id);
+            if (changedContact != null && contact != null)
+            {
+                if(changedContact.FirstName != null)
+                    contact.FirstName = changedContact.FirstName;
+                if (changedContact.LastName != null)
+                    contact.LastName = changedContact.LastName;
+            }
+
+            return contacts;
         }
 
         // DELETE api/<ContactController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IEnumerable<Contact> Delete(int id)
         {
+            if (id >= 0) 
+                contacts = contacts.Where(c => c.Id != id).ToArray<Contact>();
+            return contacts;
         }
     }
 }
